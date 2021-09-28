@@ -2,6 +2,7 @@ const debug = require('debug')('app:routes:api:pet');
 const debugError = require('debug')('app:error');
 const express = require('express');
 const { nanoid } = require('nanoid');
+const dbModule = require('../../database');
 
 const petsArray = [
   { _id: '1', name: 'Fido', createdDate: new Date() },
@@ -13,8 +14,9 @@ const petsArray = [
 const router = express.Router();
 
 // define routes
-router.get('/list', (req, res, next) => {
-  res.json(petsArray);
+router.get('/list', async (req, res, next) => {
+  const pets = await dbModule.findAllPets();
+  res.json(pets);
 });
 router.get('/:petId', (req, res, next) => {
   const petId = req.params.petId;
