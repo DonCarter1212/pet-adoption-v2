@@ -41,6 +41,11 @@ async function insertOnePet(pet) {
   await db.collection('pets').insertOne(pet);
 }
 
+async function updatePet(pet) {
+  const db = await connect();
+  await db.collection('pets').updateOne({ _id: { $eq: petId } });
+}
+
 ping();
 
 module.exports = {

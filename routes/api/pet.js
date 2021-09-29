@@ -1,5 +1,6 @@
 const debug = require('debug')('app:routes:api:pet');
 const debugError = require('debug')('app:error');
+const e = require('express');
 const express = require('express');
 const { nanoid } = require('nanoid');
 const dbModule = require('../../database');
@@ -61,27 +62,38 @@ router.put('/new', async (req, res, next) => {
   }
 });
 router.put('/:petId', (req, res, next) => {
-  const petId = req.params.petId;
-  const { species, name, age, gender } = req.body;
+  try {
+    const petId = newId(req.params.id);
+    const pet = findPetById(petId);
+    if (!pet) {
+      res.status(404).json({ error:  `Pet ${petId} not found.`})
+    } else {
+        const edits = {
+        id = petId,
+        species = req.body.species,
+        name = req.body.name,
+        age = parseInt(req.body.age),
+        gender = req.body.gender,
+        lastUpdated = new Date(),
+      }
 
-  const pet = petsArray.find((x) => x._id == petId);
-  if (!pet) {
-    res.status(404).json({ error: 'Pet not found.' });
-  } else {
-    if (species != undefined) {
-      pet.species = species;
+      if (!species) {
+        species = pet.species;
+      }
+      if (!name) {
+        name = pet.name;
+      }
+      if (!age) {
+        age = pet.age;
+      }
+      if (!gender) {
+        gender = pet.gender;
+      }
+      pet = edits;
+      res.json(pet);
     }
-    if (name != undefined) {
-      pet.name = name;
-    }
-    if (age != undefined) {
-      pet.age = parseInt(age);
-    }
-    if (gender != undefined) {
-      pet.gender = gender;
-    }
-    pet.lastUpdated = new Date();
-    res.json(pet);
+  } catch (err) {
+    next(err);
   }
 });
 router.delete('/:petId', (req, res, next) => {
