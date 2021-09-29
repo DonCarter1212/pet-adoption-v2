@@ -36,6 +36,17 @@ router.get('/:petId', async (req, res, next) => {
 });
 router.put('/new', async (req, res, next) => {
   try {
+    const petId = newId(req.params.petId);
+    const update = req.body;
+    debug(`update pet ${petId}`, update);
+
+    const pet = await dbModule.findPetById(petId);
+    if (!pet) {
+      res.status(404).json({ error: `Pet ${petId} not found.`});
+    } else {
+      await dbModule.updateOnePet(petId, update);
+      res.json({ message: `Pet ${petId} updated.`});
+    }
     const pet = {
       _id: newId(),
       species: req.body.species,
@@ -76,35 +87,34 @@ router.put('/:petId', (req, res, next) => {
         gender = req.body.gender,
         lastUpdated = new Date(),
       }
-
-      if (!species) {
-        species = pet.species;
-      }
-      if (!name) {
-        name = pet.name;
-      }
-      if (!age) {
-        age = pet.age;
-      }
-      if (!gender) {
-        gender = pet.gender;
-      }
-      pet = edits;
-      res.json(pet);
     }
   } catch (err) {
     next(err);
   }
 });
 router.delete('/:petId', (req, res, next) => {
-  const petId = req.params.petId;
-  const index = petsArray.findIndex((x) => x._id == petId);
-  if (index < 0) {
-    res.status(404).json({ error: 'Pet not found.' });
-  } else {
-    petsArray.splice(index, 1);
-    res.json({ message: 'Pet deleted.' });
+  try {
+    const petId = newId(req.params.petId);
+    debug(`delete pet ${petId}`);
+
+    const pet = await dbModule.findPetById(petId);
+    if (!pet) {
+      res.status(404).json({ error: `Pet ${petId} not found.`});
+    } else {
+      await dbModule.deleteOnePet(petId);
+      res.json({ message: `Pet ${petId} deleted.`});
+    }
+  } catch (err) {
+    next(err);
   }
+  // const petId = req.params.petId;
+  // const index = petsArray.findIndex((x) => x._id == petId);
+  // if (index < 0) {
+  //   res.status(404).json({ error: 'Pet not found.' });
+  // } else {
+  //   petsArray.splice(index, 1);
+  //   res.json({ message: 'Pet deleted.' });
+  // }
 });
 
 // export router

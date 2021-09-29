@@ -41,9 +41,21 @@ async function insertOnePet(pet) {
   await db.collection('pets').insertOne(pet);
 }
 
-async function updatePet(pet) {
+async function updateOnePet(petId, update) {
   const db = await connect();
-  await db.collection('pets').updateOne({ _id: { $eq: petId } });
+  await db.collection('pets').updateOne(
+    { _id: { $eq: petId },
+      $set: {
+        ...update,
+        lastUpdated: new Date()
+      }
+    }
+  );
+}
+
+async function deleteOnePet(petId) {
+  const db = await connect();
+  await db.collection('pets').deleteOne({ _id: { $eq: petId } });
 }
 
 ping();
@@ -54,5 +66,7 @@ module.exports = {
   findAllPets,
   newId,
   findPetById,
-  insertOnePet
+  insertOnePet,
+  updateOnePet,
+  deleteOnePet
 };
