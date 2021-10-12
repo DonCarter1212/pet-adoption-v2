@@ -1,11 +1,3 @@
-const debug = require('debug')('app:server');
-const debugError = require('debug')('app:error');
-const express = require('express');
-const { nanoid } = require('nanoid');
-const config = require('config');
-const dbModule = require('./database');
-const validId = require('../../route/api/pet');
-
 const { ObjectId } = require('mongodb');
 
 const validId = (paramName) => {

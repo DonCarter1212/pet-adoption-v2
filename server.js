@@ -5,7 +5,6 @@ const { nanoid } = require('nanoid');
 const config = require('config');
 const dbModule = require('./database');
 
-const Joi = require('joi');
 // define custom objectId validator
 const Joi = require('joi');
 Joi.objectId = () => {
